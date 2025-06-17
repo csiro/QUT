@@ -1,0 +1,30 @@
+# Ignore build directory
+build/
+
+# Ignore Python cache directories
+__pycache__/
+*/__pycache__/
+
+# Ignore Python egg-info directories
+*.egg-info/
+dist/
+*.egg
+
+# Ignore virtual environments
+venv/
+env/
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore logs
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore PyCharm project settings
+.idea/

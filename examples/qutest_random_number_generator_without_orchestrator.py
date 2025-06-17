@@ -1,24 +1,3 @@
-# QUTest (Quantum Unit Testing)
-
-The `qutest` framework facilitates writing small and readable unit tests for quantum software. 
-The `qutest`  framework does not require additional quantum resources beyond those already needed by the application and utilizes quantum tomography or statistical tests on the data obtained from measurements.
-
-
-## Get started
-
-### Install from source
-
-```bash
-git https://github.com/freude/QUTest.git
-cd QUTest
-pip install -r requirements.txt
-pip install .
-```
-
-### Create your first test
-
-
-```python
 import numpy as np
 import qiskit
 from qiskit_aer import AerSimulator
@@ -61,14 +40,3 @@ test.run(subprogram1)
 test.run(subprogram2)
 test.shots = 10
 test.run(subprogram1)
-```
-
-This code should produce an output similar to the following:
-
-```
-[PASSED]: with a 0.999 probability of passing.
-
-[FAILED]: with a 0.317 probability of passing.
-
-[FAILED]: with a 0.689 probability of passing.
-```
