@@ -1,11 +1,11 @@
-import qutest
+import qut
 import warnings
 from qiskit.quantum_info import partial_trace
 from qiskit_aer import AerSimulator
 import numpy as np
 from math import gcd, floor, log
 import matplotlib.pyplot as plt
-from qutest.aux_functions import make_keys
+from qut.aux_functions import make_keys
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit.quantum_info import DensityMatrix
 from code_samples_shor import mod_mult_cirquit, fourier, fourier_ground_truth, fourier_ground_truth1
@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore")
 
 # cirquit = mod_mult_gate_cirquit(circuit, a, k, N, qubit, target)
 
-class MyTests(qutest.QUT_ST):
+class MyTests(qut.QUT_ST):
     """Tests for Subroutine1 based on the quantum state tomography workflow"""
 
     def setUp(self):
@@ -51,7 +51,7 @@ class MyTests(qutest.QUT_ST):
         return dens
 
 
-class MyTests_f(qutest.QUT_PROJ):
+class MyTests_f(qut.QUT_PROJ):
     """Tests for Subroutine1 based on the projective measurements and statistical tests workflow"""
 
     def setUp(self):
@@ -174,8 +174,8 @@ def test_suit_subroutine1(num_shots):
                            measurement_indices=[8, 9, 10, 11],
                            title='Noise model is ' + noise).run(mod_mult_cirquit)
 
-            res.append(test.output_data['fid'])
-            times.append(test.output_data['time'] / shots)
+            res.append(test.workflow_data['fid'])
+            times.append(test.workflow_data['time'] / shots)
 
         ans_res.append(res)
         ans_times.append(times)
@@ -199,8 +199,8 @@ def test_suit_subroutine2(num_shots):
                              shots=shots,
                              title='Test on the backend with noise').run(fourier)
 
-            res.append(test.output_data['fid'])
-            times.append(test.output_data['time'] / shots)
+            res.append(test.workflow_data['fid'])
+            times.append(test.workflow_data['time'] / shots)
 
         ans_res.append(res)
         ans_times.append(times)
@@ -233,16 +233,16 @@ def test_suit(test_ref, test_ref_noise):
         print("---------------------------------")
 
         test = test_ref(shots)
-        res.append(test.output_data['fid'])
-        times.append(test.output_data['time'] / shots)
+        res.append(test.workflow_data['fid'])
+        times.append(test.workflow_data['time'] / shots)
 
         print("---------------------------------")
         print("Test on the backend with noise")
         print("---------------------------------")
 
         test = test_ref_noise(shots)
-        res_noise.append(test.output_data['fid'])
-        times_noise.append(test.output_data['time'] / shots)
+        res_noise.append(test.workflow_data['fid'])
+        times_noise.append(test.workflow_data['time'] / shots)
 
     return num_shots, res, res_noise, times, times_noise
 

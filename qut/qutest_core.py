@@ -1,4 +1,4 @@
-"""Implementation of QUTest class library."""
+"""Implementation of QUT class library."""
 
 from abc import ABC, abstractmethod
 import types
@@ -10,10 +10,9 @@ from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime.fake_provider import FakeSydneyV2
 from qiskit_experiments.library import StateTomography, ProcessTomography
 from qiskit.quantum_info import state_fidelity, process_fidelity
-from qutest.aux_functions import make_keys, parse_code
+from qut.aux_functions import make_keys, parse_code
 from scipy.stats import chisquare
 import inspect
-from functools import partial
 
 
 class Proj(object):
@@ -48,7 +47,7 @@ class QUT(ABC):
             an AerSimulator initialized from the FakeSydneyV2 backend.
         params (list):
             A list of classical parameters passed to the quantum subroutine being tested.
-        output_data (dict):
+        workflow_data (dict):
             A dictionary used to store intermediate and final results generated during testing.
         title (str):
             An optional string displayed with the test result for identification or debugging.
@@ -65,7 +64,7 @@ class QUT(ABC):
         default_backend = AerSimulator.from_backend(FakeSydneyV2())  # default backend if 'backend'=None is specified
         self.backend = kwargs.get('backend', default_backend)
         self.params = []  # classical arguments for a subroutine
-        self.output_data = {}  # container for intermediate data
+        self.workflow_data = {}  # container for intermediate data
         # generated during testing
         self.title = kwargs.get('title', '')  # message to show with the test outcome
         self.shots = kwargs.get('shots', 2000)  # default number of shots for all experiments
@@ -87,7 +86,7 @@ class QUT(ABC):
         pass
 
     @abstractmethod
-    def assertEqual(self, arg1, arg2):
+    def assertEqual(self, arg1, arg2) -> float:
         """Defines the method for evaluating the assertion statement that is consistent with
         assertion arguments of a chosen experiment. This function must be redefined in the child class
         that implements a concrete orchestrator or unit test.
@@ -101,12 +100,18 @@ class QUT(ABC):
         return 0.0
 
     @abstractmethod
-    def workflow(self, qc):
+    def workflow(self, qc) -> None:
         """Defines the full testing workflow including operations specified by a experiment,
         data cleaning and post-processing. This function can be also considered as a modifier or
         a wrapper function for the experiment. This function must be redefined in the child class
         implementing a concrete orchestrator or unit test.
         """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def context_check(cls, **kwargs) -> bool:
+        """Verify the match between a protocol and context"""
         pass
 
     def run(self, unit):
@@ -138,10 +143,9 @@ class QUT(ABC):
         else:
             raise TypeError
 
-        res = self.workflow(qc)
-        res_expected = self.expected()
-        res = self.assertEqual(res, res_expected)
-        self.output_data['fid'] = res
+        self.workflow(qc)
+        res = self.workflow_data['output']
+        res = self.assertEqual(res, self.expected())
         self.print_result(res)
 
         return self
@@ -179,10 +183,19 @@ class QUT_PT(QUT, ABC):
         qstdata = qstexp.run(self.backend, seed_simulation=QUT.SEED, shots=self.shots).block_for_results()
         res = qstdata.analysis_results("state").value
         end = time.time()
-        self.output_data['time'] = end - start
-        self.output_data['rho'] = res
+        self.workflow_data['time'] = end - start
+        self.workflow_data['output'] = res
 
-        return res
+    @classmethod
+    def context_check(cls, **kwargs):
+
+        if 'value' in kwargs.keys() and isinstance(kwargs['value'], qiskit.quantum_info.Choi):
+            return True
+        elif 'context' in kwargs.keys() and kwargs['value'] == 'QUT_PT':
+            return True
+        else:
+            return False
+
 
 
 class QUT_ST(QUT, ABC):
@@ -208,10 +221,23 @@ class QUT_ST(QUT, ABC):
         qstdata = qstexp.run(self.backend, seed_simulation=QUT.SEED, shots=self.shots).block_for_results()
         res = qstdata.analysis_results("state").value
         end = time.time()
-        self.output_data['time'] = end - start
-        self.output_data['rho'] = res
+        self.workflow_data['time'] = end - start
+        self.workflow_data['output'] = res
 
-        return res
+    @classmethod
+    def context_check(cls, **kwargs):
+
+        if 'value' in kwargs.keys() and isinstance(kwargs['value'], qiskit.quantum_info.DensityMatrix):
+            return True
+        elif 'value' in kwargs.keys() and isinstance(kwargs['value'], np.ndarray):
+            if kwargs['value'].ndim == 2:
+                return True
+            else:
+                return False
+        elif 'context' in kwargs.keys() and kwargs['value'] == 'QUT_ST':
+            return True
+        else:
+            return False
 
 
 class QUT_PROJ(QUT, ABC):
@@ -222,19 +248,19 @@ class QUT_PROJ(QUT, ABC):
         Example:
     >>> import math
     >>> import qiskit
-    >>> import qutest
+    >>> import qut
     >>> from qiskit_aer import AerSimulator
     >>>
     >>> def quantum_subprogram(circuit):
     ...     circuit.rx(math.pi / 2, 0)
     ...     return circuit
     >>>
-    >>> class MyTests(qutest.QUTest):
+    >>> class MyTests(qut.QUT):
     ...
     ...     def test_1(self):
     ...         quantum_input = qiskit.QuantumCircuit(1)
     ...         quantum_input = quantum_subprogram(quantum_input)
-    ...         self.assertEqual['RelFreqCounts'](quantum_input, [0.5, 0.5])
+    ...         self.assertEqual(quantum_input, [0.5, 0.5])
     >>>
     >>> MyTests(backend=AerSimulator(), shots=2000).run()
     <BLANKLINE>
@@ -263,14 +289,28 @@ class QUT_PROJ(QUT, ABC):
         start = time.time()
         res = qstexp.run(self.backend, seed_simulation=QUT.SEED, shots=self.shots)
         end = time.time()
-        self.output_data['time'] = end - start
+        self.workflow_data['time'] = end - start
         keys = set(make_keys(qc.num_qubits))
         diff_keys = keys.difference(res.keys())
         res.update(dict(zip(diff_keys, [0] * len(diff_keys))))
         res = dict(sorted(res.items()))
-        self.output_data['rho'] = res
+        self.workflow_data['rho'] = res
+        self.workflow_data['output'] = list(res.values())
 
-        return list(res.values())
+    @classmethod
+    def context_check(cls, **kwargs):
+
+        if 'value' in kwargs.keys() and isinstance(kwargs['value'], np.ndarray):
+            if kwargs['value'].ndim == 1:
+                return True
+            else:
+                return False
+        if 'value' in kwargs.keys() and isinstance(kwargs['value'], list):
+            return True
+        elif 'context' in kwargs.keys() and kwargs['value'] == 'QUT_PROJ':
+            return True
+        else:
+            return False
 
 
 def colors_in_doctests(func): # wrapper func that alters the docstring
@@ -293,21 +333,22 @@ class QUTest(object):
     Example:
     >>> import math
     >>> import qiskit
-    >>> import qutest
+    >>> import qut
     >>> from qiskit_aer import AerSimulator
     >>>
     >>> def quantum_subprogram(circuit):
     ...     circuit.rx(math.pi / 2, 0)
     ...     return circuit
     >>>
-    >>> class MyTests(qutest.QUTest):
+    >>> class MyTests(qut.QUT):
     ...
     ...     def test_1(self):
     ...         quantum_input = qiskit.QuantumCircuit(1)
     ...         quantum_input = quantum_subprogram(quantum_input)
-    ...         self.assertEqual['RelFreqCounts'](quantum_input, [0.5, 0.5])
+    ...         self.assertEqual(quantum_input, np.array([0.5, 0.5]))
     >>>
     >>> MyTests(backend=AerSimulator(), shots=2000).run()
+    QUT_PROJ
     <BLANKLINE>
     {GREEN}[PASSED]: with a 0.999 probability of passing.{RESET}
     """
@@ -322,24 +363,16 @@ class QUTest(object):
 
     def assertEqual(self, circuit, value):
 
-        context = self._identify_context(circuit, value)
+        context = self._identify_context(value=value)
         self._assertEqual(circuit, value, context=context)
 
-    def _identify_context(self, circuit, value):
+    def _identify_context(self, **kwargs):
 
-        if isinstance(value, np.ndarray) and value.ndim == 1:
-            print('QUT_PROJ')
-            return QUT_PROJ
-        if (isinstance(value, qiskit.quantum_info.DensityMatrix) or
-                (isinstance(value, np.ndarray) and value.ndim == 2)):
-            print('QUT_ST')
-            return QUT_ST
-        if isinstance(value, qiskit.quantum_info.Choi):
-            print('QUT_PT')
-            return QUT_PT
-        else:
-            raise ValueError("Can't identify context for the assertion")
+        for item in QUT.__subclasses__():
+            if item.context_check(**kwargs):
+                return item
 
+        raise ValueError("Can't identify context for the assertion")
 
     def _assertEqual(self, circuit, value, context):
 
@@ -379,28 +412,5 @@ class QUTest(object):
 
 
 if __name__ == '__main__':
-    class MyTest(QUT_PT):
-        def setUp(self):
-            pass
 
-        def expected(self):
-            pass
-
-
-    aaa = MyTest()
-    aaa.run()
-
-
-    class MyTests(QUTest):
-        def setUp(self):
-            pass
-
-        def test_1(self):
-            pass
-
-        def test_2(self):
-            pass
-
-
-    bbb = MyTests()
-    bbb.run()
+    print(QUT.__subclasses__())

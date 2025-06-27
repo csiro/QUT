@@ -1,6 +1,6 @@
 import numpy as np
 import qiskit
-import qutest
+import qut
 from qiskit_aer import AerSimulator
 
 
@@ -12,7 +12,7 @@ def quantum_subprogram(circuit):
     return circuit
 
 
-class MyTests(qutest.QUTest):
+class MyTests(qut.QUTest):
 
     def test_1(self):
         quantum_input = qiskit.QuantumCircuit(1)

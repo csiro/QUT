@@ -1,12 +1,12 @@
 import subprocess
-import qutest
+import qut
 import numpy as np
 from code_samples_three_qubits import *
 import warnings
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.colors as colors
-from qutest import likelihood
+from qut import likelihood
 from qiskit_ibm_runtime.fake_provider import FakeSydneyV2
 from qiskit_aer.noise import NoiseModel
 from make_plots import make_plot
@@ -15,7 +15,7 @@ from make_plots import make_plot
 warnings.filterwarnings("ignore")
 
 
-class MyTests(qutest.QUT_ST):
+class MyTests(qut.QUT_ST):
 
     def setUp(self):
         nq = 3  # number of qubits
@@ -33,7 +33,7 @@ class MyTests(qutest.QUT_ST):
         return expected
 
 
-# class MyTests(qutest.QUT_PT):
+# class MyTests(qut.QUT_PT):
 #
 #     def setUp(self):
 #         nq = 3  # number of qubits
@@ -45,8 +45,8 @@ class MyTests(qutest.QUT_ST):
 #         expected = quantum_subprogram(self.setUp())
 #
 #         # import matplotlib.pyplot as plt
-#         # aaa = Choi(expected).output_data
-#         # aaa1 =PTM(expected).output_data
+#         # aaa = Choi(expected).workflow_data
+#         # aaa1 =PTM(expected).workflow_data
 #         # plt.imshow(np.real(aaa1))
 #         # plt.show()
 #
@@ -156,20 +156,20 @@ def main1():
                         shots=shots)
         test4.run(quantum_subprogram_mut3)
 
-        res_1.append(test1.output_data['fid'])
-        res_2.append(test2.output_data['fid'])
-        res_3.append(test3.output_data['fid'])
-        res_4.append(test4.output_data['fid'])
+        res_1.append(test1.workflow_data['fid'])
+        res_2.append(test2.workflow_data['fid'])
+        res_3.append(test3.workflow_data['fid'])
+        res_4.append(test4.workflow_data['fid'])
 
-        rho_1.append(test1.output_data['rho'])
-        rho_2.append(test2.output_data['rho'])
-        rho_3.append(test3.output_data['rho'])
-        rho_4.append(test4.output_data['rho'])
+        rho_1.append(test1.workflow_data['rho'])
+        rho_2.append(test2.workflow_data['rho'])
+        rho_3.append(test3.workflow_data['rho'])
+        rho_4.append(test4.workflow_data['rho'])
 
-        data_1.append(test1.output_data)
-        data_2.append(test2.output_data)
-        data_3.append(test3.output_data)
-        data_4.append(test4.output_data)
+        data_1.append(test1.workflow_data)
+        data_2.append(test2.workflow_data)
+        data_3.append(test3.workflow_data)
+        data_4.append(test4.workflow_data)
 
         print("---------------------------------")
         print("Test on the backend with noise")
@@ -197,20 +197,20 @@ def main1():
                         shots=shots)
         test4.run(quantum_subprogram_mut3)
 
-        res_1_n.append(test1.output_data['fid'])
-        res_2_n.append(test2.output_data['fid'])
-        res_3_n.append(test3.output_data['fid'])
-        res_4_n.append(test4.output_data['fid'])
+        res_1_n.append(test1.workflow_data['fid'])
+        res_2_n.append(test2.workflow_data['fid'])
+        res_3_n.append(test3.workflow_data['fid'])
+        res_4_n.append(test4.workflow_data['fid'])
 
-        rho_1_n.append(test1.output_data['rho'])
-        rho_2_n.append(test2.output_data['rho'])
-        rho_3_n.append(test3.output_data['rho'])
-        rho_4_n.append(test4.output_data['rho'])
+        rho_1_n.append(test1.workflow_data['rho'])
+        rho_2_n.append(test2.workflow_data['rho'])
+        rho_3_n.append(test3.workflow_data['rho'])
+        rho_4_n.append(test4.workflow_data['rho'])
 
-        data_1_n.append(test1.output_data)
-        data_2_n.append(test2.output_data)
-        data_3_n.append(test3.output_data)
-        data_4_n.append(test4.output_data)
+        data_1_n.append(test1.workflow_data)
+        data_2_n.append(test2.workflow_data)
+        data_3_n.append(test3.workflow_data)
+        data_4_n.append(test4.workflow_data)
 
     l1 = []
     l2 = []

@@ -1,11 +1,11 @@
 """
-This module contains core classes for the quantum unit testing framework QUTest.
+This module contains core classes for the quantum unit testing framework QUT.
 The classes implement a library of testing protocols for quantum subroutines for various assertion arguments.
 
 Example of usage:
     import numpy as np
     import qiskit
-    import qutest
+    import qut
     from qiskit_aer import AerSimulator
 
 
@@ -15,7 +15,7 @@ Example of usage:
         return circuit
 
 
-    class MyTests(qutest.QUT_PROJ):
+    class MyTests(qut.QUT_PROJ):
         #unit test based on the workflow QUT_PROJ
 
         def setUp(self):

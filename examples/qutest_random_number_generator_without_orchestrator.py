@@ -1,7 +1,7 @@
 import numpy as np
 import qiskit
 from qiskit_aer import AerSimulator
-import qutest
+import qut
 
 def subprogram1(circuit):
     """Tested quantum subroutine -
@@ -19,7 +19,7 @@ def subprogram2(circuit):
     return circuit
 
 
-class MyTest(qutest.QUT_PROJ):
+class MyTest(qut.QUT_PROJ):
     """Class prepares environment for a quantum unit test
     based on the testing experiment performing projective measurements in the computational basis and
     Pearson's chi-squared test on the count frequencies.

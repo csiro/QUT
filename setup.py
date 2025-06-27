@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='qutest',
+    name='qut',
     version='0.0.1',
-    packages=['qutest'],
+    packages=['qut'],
     url='https://www.csiro.au',
     license='MIT',
     author='Mike Klymenko',
