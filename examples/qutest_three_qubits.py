@@ -10,6 +10,7 @@ from qut import likelihood
 from qiskit_ibm_runtime.fake_provider import FakeSydneyV2
 from qiskit_aer.noise import NoiseModel
 from make_plots import make_plot
+from qiskit.quantum_info import Choi
 
 
 warnings.filterwarnings("ignore")
@@ -33,26 +34,26 @@ class MyTests(qut.QUT_ST):
         return expected
 
 
-# class MyTests(qut.QUT_PT):
-#
-#     def setUp(self):
-#         nq = 3  # number of qubits
-#         precondition = qiskit.QuantumCircuit(nq)
-#
-#         return precondition
-#
-#     def expected(self):
-#         expected = quantum_subprogram(self.setUp())
-#
-#         # import matplotlib.pyplot as plt
-#         # aaa = Choi(expected).workflow_data
-#         # aaa1 =PTM(expected).workflow_data
-#         # plt.imshow(np.real(aaa1))
-#         # plt.show()
-#
-#         return Choi(expected)
-#         #
-#         # return PTM(expected)
+class MyTests(qut.QUT_PT):
+
+    def setUp(self):
+        nq = 3  # number of qubits
+        precondition = qiskit.QuantumCircuit(nq)
+
+        return precondition
+
+    def expected(self):
+        expected = quantum_subprogram(self.setUp())
+
+        # import matplotlib.pyplot as plt
+        # aaa = Choi(expected).workflow_data
+        # aaa1 =PTM(expected).workflow_data
+        # plt.imshow(np.real(aaa1))
+        # plt.show()
+
+        return Choi(expected)
+        #
+        # return PTM(expected)
 
 
 def main():
@@ -161,10 +162,10 @@ def main1():
         res_3.append(test3.workflow_data['fid'])
         res_4.append(test4.workflow_data['fid'])
 
-        rho_1.append(test1.workflow_data['rho'])
-        rho_2.append(test2.workflow_data['rho'])
-        rho_3.append(test3.workflow_data['rho'])
-        rho_4.append(test4.workflow_data['rho'])
+        rho_1.append(test1.workflow_data['output'])
+        rho_2.append(test2.workflow_data['output'])
+        rho_3.append(test3.workflow_data['output'])
+        rho_4.append(test4.workflow_data['output'])
 
         data_1.append(test1.workflow_data)
         data_2.append(test2.workflow_data)
@@ -202,10 +203,10 @@ def main1():
         res_3_n.append(test3.workflow_data['fid'])
         res_4_n.append(test4.workflow_data['fid'])
 
-        rho_1_n.append(test1.workflow_data['rho'])
-        rho_2_n.append(test2.workflow_data['rho'])
-        rho_3_n.append(test3.workflow_data['rho'])
-        rho_4_n.append(test4.workflow_data['rho'])
+        rho_1_n.append(test1.workflow_data['output'])
+        rho_2_n.append(test2.workflow_data['output'])
+        rho_3_n.append(test3.workflow_data['output'])
+        rho_4_n.append(test4.workflow_data['output'])
 
         data_1_n.append(test1.workflow_data)
         data_2_n.append(test2.workflow_data)

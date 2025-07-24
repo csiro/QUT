@@ -1,5 +1,20 @@
 import numpy as np
 import types
+import copy
+import functools
+
+
+def detach(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # Create copies of the arguments
+        args_copy = copy.deepcopy(args)
+        kwargs_copy = copy.deepcopy(kwargs)
+
+        # Call the original function with the copies
+        result = func(*args_copy, **kwargs_copy)
+        return result
+    return wrapper
 
 
 def parse_code(data):

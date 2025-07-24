@@ -1,0 +1,11 @@
+colorama==0.4.6
+matplotlib==3.10.3
+numpy==2.3.1
+qiskit==1.2.4
+qiskit_aer==0.15.1
+qiskit_experiments==0.8.1
+qiskit_ibm_runtime==0.33.1
+scikit_learn==1.7.1
+scipy==1.16.0
+setuptools==65.5.0
+setuptools==65.5.1

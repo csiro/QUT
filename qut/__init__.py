@@ -40,4 +40,4 @@ Version:
 __all__ = ['QUT_ST', 'QUT_PT', 'QUT_PROJ', 'QUTest']
 
 from .qutest_core import QUT_ST, QUT_PT, QUT_PROJ, QUTest
-from .aux_functions import make_keys, parse_code, likelihood
+from .aux_functions import make_keys, parse_code, likelihood, detach

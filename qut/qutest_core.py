@@ -13,6 +13,10 @@ from qiskit.quantum_info import state_fidelity, process_fidelity
 from qut.aux_functions import make_keys, parse_code
 from scipy.stats import chisquare
 import inspect
+import warnings
+
+
+warnings.filterwarnings("ignore")
 
 
 class Proj(object):
@@ -146,6 +150,7 @@ class QUT(ABC):
         self.workflow(qc)
         res = self.workflow_data['output']
         res = self.assertEqual(res, self.expected())
+        self.workflow_data['fid'] = res
         self.print_result(res)
 
         return self
@@ -280,8 +285,9 @@ class QUT_PROJ(QUT, ABC):
         arg1 = arg1[ind] / self.shots
         arg2 = arg2[ind]
 
-        fid = chisquare(f_obs=arg1, f_exp=arg2, sum_check=False, ddof=len(arg1) - 2)
-        return fid.pvalue
+        fid1 = chisquare(f_obs=arg1, f_exp=arg2, sum_check=False, ddof=len(arg1) - 2)
+        fid2 = chisquare(f_obs=arg2, f_exp=arg1, sum_check=False, ddof=len(arg1) - 2)
+        return max(fid1.pvalue, fid2.pvalue)
 
     def workflow(self, qc):
         qc.measure_all()
@@ -361,6 +367,8 @@ class QUTest(object):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+        self.save_data = True
+
     def assertEqual(self, circuit, value):
 
         context = self._identify_context(value=value)
@@ -394,13 +402,21 @@ class QUTest(object):
 
         strategy = MyTest(**self.__dict__)
         strategy.run(circuit)
-        self.tests.append(strategy)
 
-    def run(self):
+        if self.save_data:
+            self.tests.append(strategy)
+
+    def run(self, save_data=True):
         """Executes all test methods in this class whose names start with 'test'."""
+
+        self.save_data = save_data
 
         attrs = (getattr(self, self.__class__.__name__) for self.__class__.__name__ in dir(self))
         test_methods = filter(inspect.ismethod, attrs)
+
+        if 'setUp' in dir(self):
+            set_setup = getattr(self, 'setUp')
+            set_setup()
 
         for test_method in test_methods:
             try:
