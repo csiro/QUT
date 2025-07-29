@@ -6,6 +6,5 @@ qiskit_aer==0.15.1
 qiskit_experiments==0.8.1
 qiskit_ibm_runtime==0.33.1
 scikit_learn==1.7.1
-scipy==1.16.0
-setuptools==65.5.0
+scipy==1.16.0c
 setuptools==65.5.1

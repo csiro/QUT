@@ -9,7 +9,7 @@ The `qutest`  framework does not require additional quantum resources beyond tho
 ### Install from source
 
 ```bash
-git https://github.com/freude/QUTest.git
+git https://github.com/csiro-internal/QUT
 cd QUT
 pip install -r requirements.txt
 pip install .
@@ -18,57 +18,63 @@ pip install .
 ### Create your first test
 
 ```python
-import numpy as np
-import qiskit
+from qiskit import QuantumCircuit
+from qiskit.quantum_info import DensityMatrix, Choi
 from qiskit_aer import AerSimulator
-import qut
+from qut import QUTest, detach
 
 
-def subprogram1(circuit):
-    """Tested quantum subroutine -
-       random number generator with uniform distribution"""
-
-    circuit.rx(np.pi / 2, 0)
+@detach
+def subroutine_correct(circuit):
+    circuit.x(0)  # apply Hadamard gate to the first qubit
+    circuit.h(0)  # apply phase shift gate to the first qubit
+    circuit.cx(0, 1)
     return circuit
 
 
-def subprogram2(circuit):
-    """Tested quantum subroutine -
-       random number generator with uniform distribution"""
-
-    circuit.rx(np.pi, 0)
+@detach
+def subroutine_error(circuit):
+    circuit.x(0)  # apply Hadamard gate to the first qubit
+    circuit.h(1)  # apply phase shift gate to the first qubit
+    circuit.cx(0, 1)
     return circuit
 
 
-class MyTest(qut.QUT_PROJ):
-    """Class prepares environment for a quantum unit test
-    based on the testing experiment performing projective measurements in the computational basis and
-    Pearson's chi-squared test on the count frequencies.
-    """
+class MyTests(QUTest):
+    """Class prepares environment for a quantum unit test."""
 
     def setUp(self):
-        """Prepare state for the input quantum register"""
-        return qiskit.QuantumCircuit(1)
+        self.qinput = QuantumCircuit(2)
+        self.distr = [0.5, 0.0, 0.0, 0.5]
+        self.state = DensityMatrix([[0.5, 0.0, 0.0, -0.5],
+                                       [0.0, 0.0, 0.0, 0.0],
+                                       [0.0, 0.0, 0.0, 0.0],
+                                       [-0.5, 0.0, 0.0, 0.5]])
+        self.proc = Choi(subroutine_correct(self.qinput))
 
-    def expected(self):
-        """Prepare expected output"""
-        return np.array([0.5, 0.5])
+    def test_1(self):
+        self.assertEqual(subroutine_correct(self.qinput), self.distr)
+        self.assertEqual(subroutine_correct(self.qinput), self.state)
+        self.assertEqual(subroutine_correct(self.qinput), self.proc)
+
+    def test_2(self):
+        self.assertEqual(subroutine_error(self.qinput), self.distr)
+        self.assertEqual(subroutine_error(self.qinput), self.state)
+        self.assertEqual(subroutine_error(self.qinput), self.proc)
 
 
-# run test
-test = MyTest(backend=AerSimulator(), shots=2000)
-test.run(subprogram1)
-test.run(subprogram2)
-test.shots = 10
-test.run(subprogram1)
+# run tests
+tests = MyTests(backend=AerSimulator(), shots=3000)
+tests.run()
 ```
 
 This code should produce an output similar to the following:
 
 ```
-[PASSED]: with a 0.999 probability of passing.
-
-[FAILED]: with a 0.317 probability of passing.
-
-[FAILED]: with a 0.689 probability of passing.
+[PASSED]: with a 0.981 probability of passing.
+[PASSED]: with a 0.995 probability of passing.
+[PASSED]: with a 0.986 probability of passing.
+[FAILED]: with a 0.000 probability of passing.
+[FAILED]: with a 0.256 probability of passing.
+[FAILED]: with a 0.000 probability of passing.
 ```
