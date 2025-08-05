@@ -1,7 +1,7 @@
-# QUTest (Quantum Unit Testing)
+# QUT (Quantum Unit Testing)
 
-The `qutest` framework facilitates writing small and readable unit tests for quantum software. 
-The `qutest`  framework does not require additional quantum resources beyond those already needed by the application and utilizes quantum tomography or statistical tests on the data obtained from measurements.
+The `qut` framework facilitates writing small and readable unit tests for quantum software. 
+The `qut`  framework does not require additional quantum resources beyond those already needed by the application and utilizes quantum tomography or statistical tests on the data obtained from measurements.
 
 
 ## Get started
