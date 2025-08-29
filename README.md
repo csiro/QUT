@@ -26,16 +26,16 @@ from qut import QUTest, detach
 
 @detach
 def subroutine_correct(circuit):
-    circuit.x(0)  # apply Hadamard gate to the first qubit
-    circuit.h(0)  # apply phase shift gate to the first qubit
+    circuit.x(0)  # apply Pauli-X gate to the first qubit
+    circuit.h(0)  # apply Hadamard gate to the first qubit
     circuit.cx(0, 1)
     return circuit
 
 
 @detach
-def subroutine_error(circuit):
-    circuit.x(0)  # apply Hadamard gate to the first qubit
-    circuit.h(1)  # apply phase shift gate to the first qubit
+def subroutine_with_error(circuit):
+    circuit.x(0)  # apply Pauli-X gate to the first qubit
+    circuit.h(1)  # apply Hadamard gate to the first qubit
     circuit.cx(0, 1)
     return circuit
 
@@ -58,9 +58,9 @@ class MyTests(QUTest):
         self.assertEqual(subroutine_correct(self.qinput), self.proc)
 
     def test_2(self):
-        self.assertEqual(subroutine_error(self.qinput), self.distr)
-        self.assertEqual(subroutine_error(self.qinput), self.state)
-        self.assertEqual(subroutine_error(self.qinput), self.proc)
+        self.assertEqual(subroutine_with_error(self.qinput), self.distr)
+        self.assertEqual(subroutine_with_error(self.qinput), self.state)
+        self.assertEqual(subroutine_with_error(self.qinput), self.proc)
 
 
 # run tests
