@@ -70,11 +70,11 @@ tests.run()
 
 This code should produce an output similar to the following:
 
-```
-[PASSED]: with a 0.981 probability of passing.
-[PASSED]: with a 0.995 probability of passing.
-[PASSED]: with a 0.986 probability of passing.
-[FAILED]: with a 0.000 probability of passing.
-[FAILED]: with a 0.256 probability of passing.
-[FAILED]: with a 0.000 probability of passing.
-```
+
+<span style="color:green">[PASSED]: with a 0.981 probability of passing.</span>\
+<span style="color:green">[PASSED]: with a 0.994 probability of passing.</span>\
+<span style="color:green">[PASSED]: with a 0.985 probability of passing.</span>\
+<span style="color:red">[FAILED]: with a 0.000 probability of passing.</span>\
+<span style="color:red">[FAILED]: with a 0.254 probability of passing.</span>\
+<span style="color:red">[FAILED]: with a 0.000 probability of passing.</span>
+
