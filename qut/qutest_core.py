@@ -131,7 +131,9 @@ class QUT(ABC):
 
         unit = parse_code(unit)
 
-        self.print_head()
+        if len(self.title) > 0:
+            print(self.title)
+
         qc = self.setUp()
 
         if isinstance(unit, types.FunctionType):
@@ -165,10 +167,6 @@ class QUT(ABC):
         else:
             print(Fore.RED + '[FAILED]: with a {:1.3f} probability of passing.'.format(fid) + Fore.RESET)
 
-    def print_head(self):
-        """Prints out a head message before running the test."""
-
-        print(self.title)
 
 
 class QUT_PT(QUT, ABC):
