@@ -183,7 +183,7 @@ class QUT_PT(QUT, ABC):
     def workflow(self, qc):
         qstexp = self.experiment(qc)
         start = time.time()
-        qstdata = qstexp.run(self.backend, seed_simulation=QUT.SEED, shots=self.shots).block_for_results()
+        qstdata = qstexp.run(self.backend, seed_simulator=QUT.SEED, shots=self.shots).block_for_results()
         res = qstdata.analysis_results("state").value
         end = time.time()
         self.workflow_data['time'] = end - start
@@ -221,7 +221,7 @@ class QUT_ST(QUT, ABC):
 
         start = time.time()
         # qstdata = qstexp.run(self.backend, seed_simulation=SEED, shots=self.shots, fitter="cvxpy_gaussian_lstsq").block_for_results()
-        qstdata = qstexp.run(self.backend, seed_simulation=QUT.SEED, shots=self.shots).block_for_results()
+        qstdata = qstexp.run(self.backend, seed_simulator=QUT.SEED, shots=self.shots).block_for_results()
         res = qstdata.analysis_results("state").value
         end = time.time()
         self.workflow_data['time'] = end - start
