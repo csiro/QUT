@@ -9,7 +9,7 @@ The `qut`  framework does not require additional quantum resources beyond those 
 ### Install from source
 
 ```bash
-git https://github.com/csiro-internal/QUT
+git clone https://github.com/csiro-internal/QUT
 cd QUT
 pip install -r requirements.txt
 pip install .
